@@ -3,40 +3,38 @@ package com.condingtest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
 public class Main {
-  static int[] sum;
-  static int[][] dp;
-
   public static void main(String[] args) throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-    int T = Integer.parseInt(br.readLine());
+    String str = br.readLine();
+    String bomb = br.readLine();
 
-    while (T-- > 0) {
-      int K = Integer.parseInt(br.readLine());
-      int[] files = new int[K + 1];
-      sum = new int[K + 1];
-      dp = new int[K + 1][K + 1];
+    StringBuilder sb = new StringBuilder();
 
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      for (int i = 1; i <= K; i++) {
-        files[i] = Integer.parseInt(st.nextToken());
-        sum[i] = sum[i - 1] + files[i];
-      }
+    int bombLength = bomb.length();
+    for (int i = 0; i < str.length(); i++) {
+      sb.append(str.charAt(i));
 
-      for (int len = 2; len <= K; len++) {
-        for (int i = 1; i <= K; i++) {
-          int j = i + len - 1;
-          dp[i][j] = Integer.MAX_VALUE;
-
-          for (int k = i; k < j; k++) {
-            dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k + 1][j] + sum[j] - sum[i - 1]);
+      if (sb.length() >= bombLength) {
+        boolean flag = true;
+        for (int j = 0; j < bombLength; j++) {
+          if (sb.charAt(sb.length() - bombLength + j) != bomb.charAt(j)) {
+            flag = false;
+            break;
           }
         }
+        if (flag) {
+          sb.delete(sb.length() - bombLength, sb.length());
+        }
       }
-      System.out.println(dp[1][K]);
+    }
+
+    if (sb.length() == 0) {
+      System.out.println("FRULA");
+    } else {
+      System.out.println(sb.toString());
     }
   }
 }
