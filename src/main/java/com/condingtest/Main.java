@@ -1,45 +1,43 @@
 package com.condingtest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
   public static void main(String[] args) throws IOException {
+    // 입력 받기
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    int N = Integer.parseInt(br.readLine());
 
-    int n = Integer.parseInt(br.readLine());
+    int[] dp = new int[N + 1]; // 최소 연산 횟수 저장
+    int[] prev = new int[N + 1]; // 경로 저장
 
-    int[] arr = new int[n];
+    for (int i = 2; i <= N; i++) {
+      dp[i] = dp[i - 1] + 1;
+      prev[i] = i - 1;
 
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    for (int i = 0; i < n; i++) {
-      arr[i] = Integer.parseInt(st.nextToken());
-    }
+      if (i % 2 == 0 && dp[i / 2] + 1 < dp[i]) {
+        dp[i] = dp[i / 2] + 1;
+        prev[i] = i / 2;
+      }
 
-    Arrays.sort(arr);
-
-    int x = Integer.parseInt(br.readLine());
-
-    int count = 0;
-    int start = 0;
-    int end = n - 1;
-
-    while (start < end) {
-      int sum = arr[start] + arr[end];
-      if (sum == x) {
-        count++;
-        start++;
-        end--;
-      } else if (sum > x) {
-        end--;
-      } else {
-        start++;
+      if (i % 3 == 0 && dp[i / 3] + 1 < dp[i]) {
+        dp[i] = dp[i / 3] + 1;
+        prev[i] = i / 3;
       }
     }
 
-    System.out.println(count);
+    // 최소 연산 횟수 출력
+    System.out.println(dp[N]);
+
+    // 경로 역추적 출력
+    StringBuilder sb = new StringBuilder();
+    int current = N;
+    while (current != 0) {
+      sb.append(current).append(" ");
+      current = prev[current];
+    }
+
+    System.out.println(sb.toString().trim()); // 마지막 공백 제거
   }
 }
