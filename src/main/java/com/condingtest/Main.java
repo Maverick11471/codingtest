@@ -4,40 +4,55 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+  static List<Integer>[] tree;
+  static boolean[] visited;
+  static int[] parent;
+
   public static void main(String[] args) throws IOException {
-    // 입력 받기
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    int N = Integer.parseInt(br.readLine());
 
-    int[] dp = new int[N + 1]; // 최소 연산 횟수 저장
-    int[] prev = new int[N + 1]; // 경로 저장
+    int n = Integer.parseInt(br.readLine()); // 노드 개수
 
-    for (int i = 2; i <= N; i++) {
-      dp[i] = dp[i - 1] + 1;
-      prev[i] = i - 1;
+    tree = new ArrayList[n + 1]; // 1번 노드부터 사용
+    visited = new boolean[n + 1];
+    parent = new int[n + 1];
 
-      if (i % 2 == 0 && dp[i / 2] + 1 < dp[i]) {
-        dp[i] = dp[i / 2] + 1;
-        prev[i] = i / 2;
-      }
-
-      if (i % 3 == 0 && dp[i / 3] + 1 < dp[i]) {
-        dp[i] = dp[i / 3] + 1;
-        prev[i] = i / 3;
-      }
+    // 각 노드에 대해 리스트 초기화
+    for (int i = 1; i <= n; i++) {
+      tree[i] = new ArrayList<>();
     }
 
-    // 최소 연산 횟수 출력
-    System.out.println(dp[N]);
+    // 간선 정보 입력
+    for (int i = 0; i < n - 1; i++) {
+      StringTokenizer st = new StringTokenizer(br.readLine());
+      int u = Integer.parseInt(st.nextToken());
+      int v = Integer.parseInt(st.nextToken());
 
-    // 경로 역추적 출력
+      // 양방향 연결
+      tree[u].add(v);
+      tree[v].add(u);
+    }
+
+    // DFS 시작 (루트 노드는 1)
+    dfs(1);
+
+    // 2번 노드부터 부모 출력
     StringBuilder sb = new StringBuilder();
-    int current = N;
-    while (current != 0) {
-      sb.append(current).append(" ");
-      current = prev[current];
+    for (int i = 2; i <= n; i++) {
+      sb.append(parent[i]).append("\n");
     }
 
-    System.out.println(sb.toString().trim()); // 마지막 공백 제거
+    System.out.print(sb);
+  }
+
+  static void dfs(int current) {
+    visited[current] = true;
+
+    for (int next : tree[current]) {
+      if (!visited[next]) {
+        parent[next] = current; // 부모 기록
+        dfs(next);
+      }
+    }
   }
 }
