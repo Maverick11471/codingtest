@@ -1,40 +1,55 @@
-package com.condingtest;
-
 import java.io.*;
 import java.util.*;
 
-public class MainTwo {
+public class Main {
+
+  static List<List<Integer>> graph = new ArrayList<>();
+  static int[] parent;
+  static boolean[] visited;
+
   public static void main(String[] args) throws IOException {
+    // 입력 초기화
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    int N = Integer.parseInt(br.readLine());
+    int n = Integer.parseInt(br.readLine());
 
-    int[] dp = new int[N + 1];
-    int[] prev = new int[N + 1];
-
-    for (int i = 2; i <= N; i++) {
-      dp[i] = dp[i - 1] + 1;
-      prev[i] = i - 1;
-
-      if (i % 2 == 0 && dp[i / 2] + 1 < dp[i]) {
-        dp[i] = dp[i / 2] + 1;
-        prev[i] = i / 2;
-      }
-
-      if (i % 3 == 0 && dp[i / 3] + 1 < dp[i]) {
-        dp[i] = dp[i / 3] + 1;
-        prev[i] = i / 3;
-      }
+    // 그래프 초기화
+    for (int i = 0; i <= n; i++) {
+      graph.add(new ArrayList<>());
     }
 
-    System.out.println(dp[N]);
+    parent = new int[n + 1];
+    visited = new boolean[n + 1];
 
+    // 간선 입력 받기
+    for (int i = 0; i < n - 1; i++) {
+      StringTokenizer st = new StringTokenizer(br.readLine());
+      int u = Integer.parseInt(st.nextToken());
+      int v = Integer.parseInt(st.nextToken());
+
+      graph.get(u).add(v);
+      graph.get(v).add(u);
+    }
+
+    // 루트 노드에서 DFS 시작
+    dfs(1);
+
+    // 2번 노드부터 부모 출력
     StringBuilder sb = new StringBuilder();
-    int current = N;
-    while (current != 0) {
-      sb.append(current).append(" ");
-      current = prev[current];
+    for (int i = 2; i <= n; i++) {
+      sb.append(parent[i]).append("\n");
     }
 
-    System.out.println(sb.toString().trim());
+    System.out.print(sb);
+  }
+
+  private static void dfs(int current) {
+    visited[current] = true;
+
+    for (int next : graph.get(current)) {
+      if (!visited[next]) {
+        parent[next] = current; // 부모 기록
+        dfs(next);
+      }
+    }
   }
 }

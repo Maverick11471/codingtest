@@ -1,58 +1,61 @@
 package com.condingtest;
 
 import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.StringTokenizer;
 
 public class Main {
-  static List<Integer>[] tree;
-  static boolean[] visited;
   static int[] parent;
+
+  // Find: 부모 노드를 찾는다 (경로 압축)
+  static int find(int x) {
+    if (x == parent[x]) return x;
+    return parent[x] = find(parent[x]);
+  }
+
+  // Union: 두 집합을 합친다
+  static void union(int a, int b) {
+    int rootA = find(a);
+    int rootB = find(b);
+    if (rootA != rootB) {
+      parent[rootB] = rootA;
+    }
+  }
 
   public static void main(String[] args) throws IOException {
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    StringTokenizer st = new StringTokenizer(br.readLine());
 
-    int n = Integer.parseInt(br.readLine()); // 노드 개수
+    int n = Integer.parseInt(st.nextToken()); // 원소 개수
+    int m = Integer.parseInt(st.nextToken()); // 연산 개수
 
-    tree = new ArrayList[n + 1]; // 1번 노드부터 사용
-    visited = new boolean[n + 1];
     parent = new int[n + 1];
-
-    // 각 노드에 대해 리스트 초기화
-    for (int i = 1; i <= n; i++) {
-      tree[i] = new ArrayList<>();
+    for (int i = 0; i <= n; i++) {
+      parent[i] = i; // 자기 자신이 부모
     }
 
-    // 간선 정보 입력
-    for (int i = 0; i < n - 1; i++) {
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      int u = Integer.parseInt(st.nextToken());
-      int v = Integer.parseInt(st.nextToken());
-
-      // 양방향 연결
-      tree[u].add(v);
-      tree[v].add(u);
-    }
-
-    // DFS 시작 (루트 노드는 1)
-    dfs(1);
-
-    // 2번 노드부터 부모 출력
     StringBuilder sb = new StringBuilder();
-    for (int i = 2; i <= n; i++) {
-      sb.append(parent[i]).append("\n");
-    }
 
-    System.out.print(sb);
-  }
+    for (int i = 0; i < m; i++) {
+      st = new StringTokenizer(br.readLine());
+      int cmd = Integer.parseInt(st.nextToken());
+      int a = Integer.parseInt(st.nextToken());
+      int b = Integer.parseInt(st.nextToken());
 
-  static void dfs(int current) {
-    visited[current] = true;
-
-    for (int next : tree[current]) {
-      if (!visited[next]) {
-        parent[next] = current; // 부모 기록
-        dfs(next);
+      if (cmd == 0) {
+        union(a, b);
+      } else if (cmd == 1) {
+        if (find(a) == find(b)) {
+          sb.append("YES\n");
+        } else {
+          sb.append("NO\n");
+        }
       }
     }
+
+    System.out.print(sb.toString());
   }
 }
