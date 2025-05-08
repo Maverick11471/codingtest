@@ -1,55 +1,61 @@
+package com.condingtest;
+
 import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.StringTokenizer;
 
 public class Main {
-
-  static List<List<Integer>> graph = new ArrayList<>();
   static int[] parent;
-  static boolean[] visited;
 
-  public static void main(String[] args) throws IOException {
-    // 입력 초기화
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    int n = Integer.parseInt(br.readLine());
-
-    // 그래프 초기화
-    for (int i = 0; i <= n; i++) {
-      graph.add(new ArrayList<>());
-    }
-
-    parent = new int[n + 1];
-    visited = new boolean[n + 1];
-
-    // 간선 입력 받기
-    for (int i = 0; i < n - 1; i++) {
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      int u = Integer.parseInt(st.nextToken());
-      int v = Integer.parseInt(st.nextToken());
-
-      graph.get(u).add(v);
-      graph.get(v).add(u);
-    }
-
-    // 루트 노드에서 DFS 시작
-    dfs(1);
-
-    // 2번 노드부터 부모 출력
-    StringBuilder sb = new StringBuilder();
-    for (int i = 2; i <= n; i++) {
-      sb.append(parent[i]).append("\n");
-    }
-
-    System.out.print(sb);
+  // Find: 부모 노드를 찾는다 (경로 압축)
+  static int find(int x) {
+    if (x == parent[x]) return x;
+    return parent[x] = find(parent[x]);
   }
 
-  private static void dfs(int current) {
-    visited[current] = true;
+  // Union: 두 집합을 합친다
+  static void union(int a, int b) {
+    int rootA = find(a);
+    int rootB = find(b);
+    if (rootA != rootB) {
+      parent[rootB] = rootA;
+    }
+  }
 
-    for (int next : graph.get(current)) {
-      if (!visited[next]) {
-        parent[next] = current; // 부모 기록
-        dfs(next);
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    StringTokenizer st = new StringTokenizer(br.readLine());
+
+    int n = Integer.parseInt(st.nextToken()); // 원소 개수
+    int m = Integer.parseInt(st.nextToken()); // 연산 개수
+
+    parent = new int[n + 1];
+    for (int i = 0; i <= n; i++) {
+      parent[i] = i; // 자기 자신이 부모
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < m; i++) {
+      st = new StringTokenizer(br.readLine());
+      int cmd = Integer.parseInt(st.nextToken());
+      int a = Integer.parseInt(st.nextToken());
+      int b = Integer.parseInt(st.nextToken());
+
+      if (cmd == 0) {
+        union(a, b);
+      } else if (cmd == 1) {
+        if (find(a) == find(b)) {
+          sb.append("YES\n");
+        } else {
+          sb.append("NO\n");
+        }
       }
     }
+
+    System.out.print(sb.toString());
   }
 }
